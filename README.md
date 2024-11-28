@@ -33,9 +33,3 @@ LLMs like ChatGPT were utilized during the project to:
 -   Assist on citations.
 
 The assistance provided by LLMs was focused on improving efficiency and accuracy. A record of LLM interactions is available in `other/` for transparency.
-
-## Some Checks
-
-- [ ] Remove files or directories that are unnecessary for the final analysis or presentation.
-- [ ] Verify and update comments in all R scripts for clarity.
-- [ ] Ensure the README checklist is removed once all items are addressed.
