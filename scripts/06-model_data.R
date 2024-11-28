@@ -10,9 +10,10 @@
 # Load necessary libraries
 library(ggplot2)
 library(dplyr)
+library(here)
 
 # Set the directory for saving models
-model_dir <- "~/STA304_Final/models"
+model_dir <- here("models")
 
 # Ensure the directory exists
 if (!dir.exists(model_dir)) {

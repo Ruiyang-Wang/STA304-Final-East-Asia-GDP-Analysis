@@ -1,15 +1,18 @@
 ---
-title: "Economic Trends in East Asia: GDP per Capita, Labor Force Participation, and Unemployment over Decades"
-subtitle: "The Role of Demographics and Productivity in Explaining Regional Differences Across Asia"
+title: "Understand the Impact of Demographic and Labor Market Trends on Economic Growth in East Asia"
+subtitle: "Exploring the Role of Aging, Unemployment, and Workforce Participation in GDP per Capita from 1990 to 2023"
 author: 
   - Ruiyang Wang
 thanks: "Code and data are available at: [https://github.com/Ruiyang-Wang/STA304-Final-East-Asia-GDP-Analysis.git](https://github.com/Ruiyang-Wang/STA304-Final-East-Asia-GDP-Analysis.git)."
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "This paper examines the impact of demographic changes and labor market trends on economic growth in East Asia from 1990 to 2023. Analyzing data such as GDP per capita, unemployment rates, hours worked, and labor force participation, the study shows that while East Asia has experienced overall economic growth, the effects of an aging population and a shrinking working-age group have begun to slow this progress. The findings underscore that countries such as Japan and China are facing increasing challenges from demographic changes that could reduce their economic potential. This study is important because it highlights the importance of considering demographic trends when formulating future economic policies and projections for the region."
 format: pdf
 number-sections: true
 bibliography: references.bib
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r}
@@ -17,58 +20,122 @@ bibliography: references.bib
 #| warning: false
 #| message: false
 
-install.packages("car")
-install.packages("lmtest")
+library(here)
 library(tidyverse)
 library(ggplot2)
 library(reshape2)
 library(car)
 library(lmtest)
-east_asia_data <- read_csv("~/STA304_Final/data/02-analysis_data/analysis_data.csv")
+library(modelsummary)
+east_asia_data <- read.csv(here("data/02-analysis_data/analysis_data.csv"))
 ```
 
 # Introduction
 
-Overview paragraph
+Over the past few decades, East Asia has undergone a major economic
+transformation, driven by rapid industrialization, urbanization, and
+demographic changes. However, as these countries face the challenges of
+aging populations, declining birth rates and stagnant economic growth,
+it is significant to understand how these factors interact with key
+economic indicators such as GDP per capita. This paper examines the
+relationship between demographic trends, labor market dynamics, and
+economic performance in East Asia from 1990 to 2023.
 
-Estimand paragraph
+Despite East Asia showed its historical economic success during later
+20th century and early 21st century, there are problems emerging recent
+years in demographic changes, especially related to aging population and
+shrinking working-age groups. By applying a linear regression model to
+the dataset by @economist_gdp_dataset, this paper aims to fill this gap
+by assessing the role of population aging, labor force participation
+rates, and other predictors in shaping East Asia's economic growth.
 
-Results paragraph
+The analysis found that while GDP per capita in East Asia has generally
+grown over time, the contribution of demographic factors such as the
+share of the working-age population and the labor force participation
+rate has varied. In addition, models with interaction terms and multiple
+predictors provide explanations into the diminishing impact of the
+demographic dividend, especially in countries such as Japan and China.
+These findings highlight the importance of considering demographic
+trends in economic forecasts and decision-making.
 
-Why it matters paragraph
+## Estimand
+
+The main estimand of this paper is to estimate the relationship between
+population and labor market factors and GDP per capita in East Asia
+during 1990-2023. This paper aims to measure how variables such as
+population aging, labor force participation, unemployment, and hours
+worked per capita affect economic growth in the region. This includes
+assessing the role of time (years) in GDP growth trends, examining how
+changes in the working-age and elderly populations affect GDP per
+capita, and exploring how the unemployment rate and labor force
+participation rate affect economic performance. In addition, the study
+looks at the interaction between population aging and labor force
+participation to understand how these factors work together to influence
+economic outcomes. Ultimately, the paper seeks to quantify how
+demographic changes and labor market dynamics contribute to economic
+growth in East Asia over the past few decades.
 
 ## Structure of the Paper
 
 @sec-data describes the dataset and key variables by presenting graphs.
-@sec-regression presents the simple linear regression (SLR), multiple linear regression (MLR) models used to explore the effect of sample size on support percentage.
-@sec-result presents the analytical results for dataset graphs and regression models.
-@sec-disc discusses further discussions based on paper discoveries.
-
+@sec-regression presents the simple linear regression (SLR), multiple
+linear regression (MLR) models used to explore the effect of sample size
+on support percentage. @sec-result presents the analytical results for
+dataset graphs and regression models. @sec-disc discusses further
+discussions based on paper discoveries.
 
 \newpage
+
 # Data {#sec-data}
 
 ## Overview
 
-We use the statistical programming language R [@citeR] to analyze the dataset from @economist_gdp_dataset. This dataset provides annual economic indicators, including GDP per capita, unemployment rates, and hours worked per population for countries worldwide. 
+We use the statistical programming language R [@citeR] to analyze the
+dataset from @economist_gdp_dataset. This dataset provides economic
+indicators, including GDP per capita, unemployment rates, and hours
+worked per population for countries worldwide.
 
-This dataset offers a comprehensive longitudinal perspective, covering trends from 1990 to 2023 across multiple economic and demographic variables. Its global focus allows us to analyze East Asia in depth. It aligns with our goal to explore how economic and labor trends evolve and interact with demographic factors over decades.
+@sec-rawpreview provides detailed economic indicators across multiple
+countries and years, with a particular focus on GDP per capita, labor
+market participation, and productivity measures. The dataset is
+accessible through The Economist's GitHub repository, which hosts the
+raw data and provides transparent access to economic figures from 1990
+to 2023 for a variety of countries worldwide.
 
+## Data Measurement
 
-## Measurement
+Measurements in the dataset are standardized to ensure consistency and comparability across countries and years. GDP per capita is calculated by dividing a country's gross domestic product (GDP) by its total population. To account for inflation and ensure that values are consistent across time periods, GDP data is adjusted to real GDP for more accurate cross-country comparisons. The unemployment rate reflects the percentage of the labor force that is actively looking for work. The number of hours worked per person is calculated by dividing the total number of hours worked by the entire population to arrive at the sum of labor productivity. This indicator is particularly useful in analyzing the effects of labor intensity and productivity on economic performance. Finally, demographic data, including age-specific statistics, are derived from national census data, ensuring consistency across countries. Age-related variables, such as the proportion of people aged 65 and over, are adjusted according to each country's population reporting standards to ensure comparability across time periods.
 
-The dataset aggregates real-world economic and labor market indicators, converting them into structured data entries for analysis. Below, we explain the key measurements:
+## Data Consideration
 
-- **GDP per Capita:** Calculated as GDP divided by total population, capturing average economic output per person.
-- **Unemployment Rate:** Percentage of the labor force that is unemployed, reflecting labor market health.
-- **Hours Worked per Population:** Productivity indicator, calculated as total hours worked divided by population.
+To ensure the consistency, most missing values were imputed by utilizing
+R functions in combination of `dplyr` and `lahman` packages
+[@citeLahman]. Countries outside of East Asia were excluded from the
+analysis. However,in order to make sure the intergrity of whole dataset,
+some NA values are not eliminated, since they only occur once or twice
+in a row, and all missing values has a pattern to follow, which can be
+avoided in later graphing and analyzing.
 
-To ensure the consistency, most missing values were imputed by utilizing R functions in combination of dplyr and lahman packages [@citeLahman]. Countries outside of East Asia were excluded from the analysis. However,in order to make sure the intergrity of whole dataset, some NA values are not eliminated, since they only occur once or twice in a row, and all missing values has a pattern to follow, which can be avoided in later graphing and analyzing.
+## Methodology
 
+In order to analyze the relationship between economic indicators and
+population trends, we use linear regression model. The method involves
+fitting simple and multiple regression models to estimate the effects of
+various predictors, such as the labor force participation rate,
+population aging, unemployment rate, and hours worked, on GDP per
+capita. Interaction terms are included in the model to assess how
+certain demographic factors, such as population aging and labor force
+participation, interact and collectively affect economic growth. The
+analysis was performed using the `rstanarm` package in R [@citeR], using
+default priors for Bayesian regression models to ensure robust results.
+The statistical techniques used in this paper provide a detailed
+understanding of the dynamics between demographic trends and economic
+performance over the past few decades.
 
-## Outcome Variables
+## Data Visualization
 
 ### GDP per Capita {#sec-GDPc}
+
 ```{r}
 #| warning: false
 #| message: false
@@ -82,7 +149,21 @@ gdp_trends
 
 ```
 
+The per capita GDP trends shown in [@sec-GDPc] show significant
+differences between East Asian countries from 1990 to 2023. China's
+rapid economic growth reflects the economic transformation driven by
+industrialization, urbanization and integration into the global market.
+In contrast, Japan's GDP per capita remained stable, indicating a mature
+and developed economy with limited growth potential. The per capita GDP
+of the Chinese Macao SAR has consistently exceeded that of other
+countries due to its specialized economy, which relies heavily on
+tourism and gambling industries (@greenwood2016reinventing). However,
+countries such as Mongolia and North Korea have significantly lower GDP
+per capita, highlighting the challenges they face in terms of
+development and structural economies.
+
 ### Unemployment Rate {#sec-unemployr}
+
 ```{r}
 #| label: unemployr
 #| echo: false
@@ -97,8 +178,17 @@ unemployment_trends
 
 ```
 
+The unemployment rate trend shown in [@sec-unemployr] displays
+significant differences in East Asia. Mongolia's unemployment rate
+fluctuated the most, likely due to volatility in its resource-dependent
+economy(@MongoliaDependent). In contrast, Japan and China's Hong Kong
+Special Administrative Region have maintained relatively stable and low
+unemployment rates, emphasizing their stable economies and efficient
+labor markets. China's unemployment rate is fluctuating, displays
+instability.
 
 ### Hours Worked Per Population {#sec-hr_work}
+
 ```{r}
 #| label: hr_work
 #| echo: false
@@ -114,10 +204,19 @@ hours_worked_trends
 
 ```
 
+The unemployment rate trend shown in [@sec-unemployr] displays
+significant differences in East Asia. Mongolia's unemployment rate
+fluctuated the most, likely due to volatility in its resource-dependent
+economy(@MongoliaDependent). In contrast, Japan and China's Hong Kong
+Special Administrative Region have maintained relatively stable and low
+unemployment rates, emphasizing their stable economies and efficient
+labor markets. China's unemployment rate is fluctuating, displays
+instability.
 
 ## Predictor variables
 
 ### Population Aged 65 and Older {#sec-older_age}
+
 ```{r}
 #| label: older_age
 #| echo: false
@@ -131,8 +230,17 @@ pop_over_65_vs_gdp
 
 ```
 
+The unemployment rate trend shown in [@sec-unemployr] displays
+significant differences in East Asia. Mongolia's unemployment rate
+fluctuated the most, likely due to volatility in its resource-dependent
+economy(@MongoliaDependent). In contrast, Japan and China's Hong Kong
+Special Administrative Region have maintained relatively stable and low
+unemployment rates, emphasizing their stable economies and efficient
+labor markets. China's unemployment rate is fluctuating, displays
+instability.
 
 ### Youth Population {#sec-youth_age}
+
 ```{r}
 #| label: youth_age
 #| echo: false
@@ -147,8 +255,17 @@ youth_vs_unemployment
 
 ```
 
+The unemployment rate trend shown in [@sec-unemployr] displays
+significant differences in East Asia. Mongolia's unemployment rate
+fluctuated the most, likely due to volatility in its resource-dependent
+economy(@MongoliaDependent). In contrast, Japan and China's Hong Kong
+Special Administrative Region have maintained relatively stable and low
+unemployment rates, emphasizing their stable economies and efficient
+labor markets. China's unemployment rate is fluctuating, displays
+instability.
 
 ### Labor Force Participation {#sec-labor_participation}
+
 ```{r}
 #| label: labor_participation
 #| echo: false
@@ -166,26 +283,42 @@ other_countries_plot
 
 ```
 
+As can be seen from the two labor participation rate charts shown in
+[@sec-labor_participation], China's labor force is huge, and the labor
+participation rate presents a unique pattern. While GDP per capita
+increases as labor force participation increases, the relationship is
+non-linear, indicating diminishing returns or other influencing factors
+such as productivity and industrial relocation. For other East Asian
+countries, smaller workforces exhibit more of a cluster pattern, with
+countries like Japan and China's Hong Kong Special Administrative Region
+having high GDP per capita despite a smaller workforce, highlighting the
+role of high productivity and economic efficiency.
 
-\newpage
 # Linear Regression Analysis {#sec-regression}
 
-We did our Linear regression analysis based on the `tidyverse` package. The goal of our regression analysis is divided into three steps. First, we aim to capture the general trends in GDP per capita over time. Second, we explore how interaction terms affect GDP per capita. Third, we want to find out how additional predictors, including unemployment, labor force participation, aging population, and working hours, contribute to GDP per capita.
-
+We did our Linear regression analysis based on the `tidyverse` package.
+The goal of our regression analysis is divided into three steps. First,
+we aim to capture the general trends in GDP per capita over time.
+Second, we explore how interaction terms affect GDP per capita. Third,
+we want to find out how additional predictors, including unemployment,
+labor force participation, aging population, and working hours,
+contribute to GDP per capita.
 
 \newpage
+
 ## Model 1: Simple Linear Regression {#sec-SLRmodel}
 
-Define \( y_i \) as the GDP per capita for country \( i \) in year \( t \). Let \( \text{Year}_i \) represent the year. The model is specified as:
+Define ( y_i ) as the GDP per capita for country ( i ) in year ( t ).
+Let ( \text{Year}\_i ) represent the year. The model is specified as:
 
-\[
-\begin{align}
+\[ \begin{align}
 y_i &\sim \text{Normal}(\mu_i, \sigma) \\
-y_i &= \beta_0 + \beta_1 \cdot \text{Year}_i
-\end{align}
-\]
+\mu_i &= \beta_0 + \beta_1 \cdot \text{Year}_i
+\end{align} \]
 
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.We fit this model in R using the `lm()` function, and the result is shown above.
+We run the model in R [@citeR] using the `rstanarm` package of
+@rstanarm. We use the default priors from `rstanarm`.We fit this model
+in R using the `lm()` function, and the result is shown above.
 
 ```{r}
 #| echo: false
@@ -197,24 +330,29 @@ We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use
 simple_model <- lm(gdp_over_pop ~ year, data = east_asia_data)
 modelsummary::modelsummary(simple_model)
 ```
-This linear regression assumption check is located in Appendix at [@sec-DSLR].
 
+This linear regression model validation is located in Appendix at
+[@sec-DSLR].
 
 \newpage
+
 ## Model 2: Interaction Terms {#sec-INTmodel}
 
-To explore whether the effects of one predictor depend on another, we include interaction terms in the model. Specifically, we examine how the relationship between aging population percentage \( \text{AgingPop}_i \) and GDP per capita is influenced by labor force participation \( \text{LaborForce}_i \).
+To explore whether the effects of one predictor depend on another, we
+include interaction terms in the model. Specifically, we examine how the
+relationship between aging population percentage ( \text{AgingPop}\_i )
+and GDP per capita is influenced by labor force participation (
+\text{LaborForce}\_i ).
 
-Define \( y_i \) as the GDP per capita for country \( i \) in year \( t \):
+Define ( y_i ) as the GDP per capita for country ( i ) in year ( t ):
 
-\[
-\begin{align}
+\[ \begin{align}
 y_i &\sim \text{Normal}(\mu_i, \sigma) \\
 \mu_i &= \beta_0 + \beta_1 \cdot \text{AgingPop}_i + \beta_2 \cdot \text{LaborForce}_i + \beta_3 \cdot (\text{AgingPop}_i \cdot \text{LaborForce}_i)
-\end{align}
-\]
+\end{align} \]
 
-We run the model in R [@citeR]. We fit this model in R using the `lm()` function and result is shown above.
+We run the model in R [@citeR]. We fit this model in R using the `lm()`
+function and result is shown above.
 
 ```{r}
 #| echo: false
@@ -227,22 +365,26 @@ interaction_model <- lm(gdp_over_pop ~ pop_15_to_64 * labor_force, data = east_a
 modelsummary::modelsummary(interaction_model)
 ```
 
-This linear regression assumption checks are located in Appendix at [@sec-DINT].
+This linear regression model validations are located in Appendix at
+[@sec-DINT].
 
 \newpage
+
 ## Model 3: Multiple Linear Regression {#sec-MLRmodel}
 
-We extend our analysis to include additional predictors: unemployment rate \( \text{Unemployment}_i \), labor force participation \( \text{LaborForce}_i \), aging population percentage \( \text{AgingPop}_i \), and hours worked \( \text{HoursWorked}_i \). Define \( y_i \) as the GDP per capita for country \( i \) in year \( t \):
+We extend our analysis to include additional predictors: unemployment
+rate ( \text{Unemployment}\_i ), labor force participation (
+\text{LaborForce}\_i ), aging population percentage ( \text{AgingPop}\_i
+), and hours worked ( \text{HoursWorked}\_i ). Define ( y_i ) as the GDP
+per capita for country ( i ) in year ( t ):
 
-\[
-\begin{align}
+\[ \begin{align}
 y_i &\sim \text{Normal}(\mu_i, \sigma) \\
 \mu_i &= \beta_0 + \beta_1 \cdot \text{Unemployment}_i + \beta_2 \cdot \text{LaborForce}_i + \beta_3 \cdot \text{AgingPop}_i + \beta_4 \cdot \text{HoursWorked}_i
-\end{align}
-\]
+\end{align} \]
 
-We run the model in R [@citeR]. We fit this model in R using the `lm()` function and result is shown above.
-
+We run the model in R [@citeR]. We fit this model in R using the `lm()`
+function and result is shown above.
 
 ```{r}
 #| echo: false
@@ -255,63 +397,113 @@ multiple_model <- lm(gdp_over_pop ~ unemployment_r + labor_force + pop_over_65 +
                      data = east_asia_data)
 modelsummary::modelsummary(multiple_model)
 ```
-This linear regression assumption checks are located in Appendix at [@sec-DMLR].
+
+This linear regression model validations are located in Appendix at
+[@sec-DMLR].
 
 \newpage
+
 # Result {#sec-result}
 
-## Data Visualization
+## GDP per capita with time period
 
-The per capita GDP trends shown in [@sec-GDPc] show significant differences between East Asian countries from 1990 to 2023. China's rapid economic growth reflects the economic transformation driven by industrialization, urbanization and integration into the global market. In contrast, Japan's GDP per capita remained stable, indicating a mature and developed economy with limited growth potential. The per capita GDP of the Chinese Macao SAR has consistently exceeded that of other countries due to its specialized economy, which relies heavily on tourism and gambling industries (@greenwood2016reinventing). However, countries such as Mongolia and North Korea have significantly lower GDP per capita, highlighting the challenges they face in terms of development and structural economies.
+The results of a simple linear regression analysis in [@sec-SLRmodel]
+provide the relationship between GDP per capita and time in East Asia.
 
-The unemployment rate trend shown in [@sec-unemployr] displays significant differences in East Asia. Mongolia's unemployment rate fluctuated the most, likely due to volatility in its resource-dependent economy and structural labor market issues. In contrast, Japan and China's Hong Kong Special Administrative Region have maintained relatively stable and low unemployment rates, emphasizing their stable economies and efficient labor markets. China's unemployment rate is fluctuating, displays instability.
+The slope coefficient of the annual variable is estimated to be 811.76,
+indicating that GDP per capita increases by about 811.76 units per year
+on average. This positive trend is statistically significant (p \<
+0.001), indicating that time is the key factor driving East Asian
+economic growth over the period analyzed (1990-2023). This result is in
+line with a broader understanding of the region's economic development,
+which is characterized by continued growth and industrialization.
 
-[@sec-hr_work] shows trends in per capita hours worked, providing insight into productivity and labor market dynamics. In developed countries such as Japan, the number of hours worked per person has gradually declined, reflecting policies towards a greater work-life balance and rising labor productivity. Labor demand in the Macao Special Administrative Region of China is sensitive to external economic conditions, and its fluctuations are related to the tourism-driven economy. Mongolia, by contrast, has a consistently low number of hours worked per capita, which suggests that its labor market and economic structure are inefficient.
+The model explains about 15.3% of the change in GDP per capita (R
+squared = 0.153), with an adjusted R squared of 0.1487, suggesting that
+the year variable reflects only a small part of the change in East Asian
+economies. This suggests that other factors, such as labor force
+dynamics, demographic changes, and policy interventions, play a key role
+in explaining trends in GDP per capita.
 
-The relationship between the proportion of people aged 65 and over and GDP per capita highlights an interesting trend shown by  [@sec-older_age]. Countries with older populations, such as Japan and China's Hong Kong Special Administrative Region, tend to have higher GDP per capita. This reflects the maturity of their economies and the accumulation of wealth. However, countries with younger populations, such as Mongolia, have lower GDP per capita, which may indicate development challenges and a high dependency ratio.
+## GDP per capita with Working-Age Population and Labor Force Participation
 
-The scatterplot of youth population and unemployment rate  shown in [@sec-youth_age] shows a clear pattern: the larger the youth population, the higher the unemployment rate. Mongolia is distinguished by its large youth population and correspondingly high unemployment rate, which underscores the challenge of integrating young people into the Labour market. By contrast, countries with smaller young populations, such as Japan, maintain lower unemployment rates, reflecting a more balanced labor market.
+The interaction model in [@sec-INTmodel] introduces a key dimension to the
+analysis by looking at how the relationship between the share of the
+population aged 15-64 and GDP per capita depends on the labor force
+participation rate.
 
-As can be seen from the two labor participation rate charts shown in [@sec-labor_participation], China's labor force is huge, and the labor participation rate presents a unique pattern. While GDP per capita increases as labor force participation increases, the relationship is non-linear, indicating diminishing returns or other influencing factors such as productivity and industrial relocation. For other East Asian countries, smaller workforces exhibit more of a cluster pattern, with countries like Japan and China's Hong Kong Special Administrative Region having high GDP per capita despite a smaller workforce, highlighting the role of high productivity and economic efficiency.
+The coefficient for the percentage of the population aged 15 to 64 was
+estimated at 249,600, indicating a strong positive correlation with GDP
+per capita. Every one unit increase in this percentage increases GDP per
+capita by about 249,600 units. This result is highly statistically
+significant (p\<0.001), highlighting the importance of this demographic
+in driving economic performance.
 
+The positive coefficient of the labor force participation rate is
+1.191×10\^-3, which means that a higher labor force participation rate
+contributes positively to GDP per capita. This result (p=0.000728)
+reflects the role of labor force participation in economic productivity.
 
-## Linear Regression Analysis
-### GDP per capita with time period
-The results of a simple linear regression analysis [@sec-SLRmodel] provide insights into the relationship between GDP per capita and time in East Asia. 
+The interaction term between the proportion of the population aged 15 to
+64 and the labor force participation rate is a negative coefficient
+(-1.742 ×10\^−3), indicating that the positive impact of the working-age
+population on GDP per capita decreases as the labor force participation
+rate increases. This finding (p=0.000499) highlights the complexity of
+the relationship between demographic composition and economic outcomes.
+It may reflect diminishing returns to labor, or the challenge of
+integrating a growing workforce into productive economic activity.
 
-The slope coefficient of the annual variable is estimated to be 811.76, indicating that GDP per capita increases by about 811.76 units per year on average. This positive trend is statistically significant (p < 0.001), indicating that time is the key factor driving East Asian economic growth over the period analyzed (1990-2023). This result is in line with a broader understanding of the region's economic development, which is characterized by continued growth and industrialization.
-
-The model explains about 15.3% of the change in GDP per capita (R squared = 0.153), with an adjusted R squared of 0.1487, suggesting that the year variable reflects only a small part of the change in East Asian economies. This suggests that other factors, such as labor force dynamics, demographic changes, and policy interventions, play a key role in explaining trends in GDP per capita.
-
-##  GDP per capita with Working-Age Population and Labor Force Participation
-The interaction model [@sec-INTmodel] introduces a key dimension to the analysis by looking at how the relationship between the share of the population aged 15-64 and GDP per capita depends on the labor force participation rate.
-
-The coefficient for the percentage of the population aged 15 to 64 was estimated at 249,600, indicating a strong positive correlation with GDP per capita. Every one unit increase in this percentage increases GDP per capita by about 249,600 units. This result is highly statistically significant (p<0.001), highlighting the importance of this demographic in driving economic performance.
-
-The positive coefficient of the labor force participation rate is 1.191×10^-3, which means that a higher labor force participation rate contributes positively to GDP per capita. This result (p=0.000728) reflects the role of labor force participation in economic productivity.
-
-The interaction term between the proportion of the population aged 15 to 64 and the labor force participation rate is a negative coefficient (-1.742 ×10^−3), indicating that the positive impact of the working-age population on GDP per capita decreases as the labor force participation rate increases. This finding (p=0.000499) highlights the complexity of the relationship between demographic composition and economic outcomes. It may reflect diminishing returns to labor, or the challenge of integrating a growing workforce into productive economic activity.
-
-The overall model explains 47.51% of the change in GDP per capita (R squared =0.4751), with an adjusted R squared of 0.452. Although this is a lower explanatory power than a multiple linear regression model, the inclusion of interaction terms provides valuable insights into the interactions between population and labor factors.
-
+The overall model explains 47.51% of the change in GDP per capita (R
+squared =0.4751), with an adjusted R squared of 0.452. Although this is
+a lower explanatory power than a multiple linear regression model, the
+inclusion of interaction terms gives some explanations to the
+interaction between population and labor factors.
 
 ## GDP per capita with multiple factors
-The multiple linear regression model [@sec-MLRmodel] is introduced to increase the overall explanatory power of the model.
 
-The unemployment rate coefficient is estimated at -928.4, indicating that every unit increase in the unemployment rate reduces GDP per capita by about 928.4 units. However, with a P-value of 0.0554, this predictor is not statistically significant at the 5% significance level, suggesting that its effect on GDP per capita may be limited or influenced by other factors in the model.
+The multiple linear regression model in [@sec-MLRmodel] is introduced to
+increase the overall explanatory power of the model.
 
-The coefficient of the labor force participation rate is -3.366 ×10^-5, indicating that it is negatively correlated with GDP per capita. This suggests that an increase in the labor force could dilute GDP per capita without a corresponding increase in productivity or economic capacity. This prediction is highly significant (p<0.001).
+The unemployment rate coefficient is estimated at -928.4, indicating
+that every unit increase in the unemployment rate reduces GDP per capita
+by about 928.4 units. However, with a P-value of 0.0554, this predictor
+is not statistically significant at the 5% significance level,
+suggesting that its effect on GDP per capita may be limited or
+influenced by other factors in the model.
 
-The proportion of population aging has a significant positive impact on per capita GDP, and its coefficient is 2136.0. This means that for every unit increase in the proportion of people over 65, GDP per capita increases by about 2,136 units. This finding reflects the economic structure of developed East Asian countries, where aging populations tend to be associated with higher levels of productivity and income.
+The coefficient of the labor force participation rate is -3.366 ×10\^-5,
+indicating that it is negatively correlated with GDP per capita. This
+suggests that an increase in the labor force could dilute GDP per capita
+without a corresponding increase in productivity or economic capacity.
+This prediction is highly significant (p\<0.001).
 
-Finally, hours worked per capita were also significantly positively correlated with GDP per capita (β=7.463, p<0.001), suggesting that higher average hours worked contributed to an increase in GDP per capita, which may reflect labor productivity and economic effort.
+The proportion of population aging has a significant positive impact on
+per capita GDP, and its coefficient is 2136.0. This means that for every
+unit increase in the proportion of people over 65, GDP per capita
+increases by about 2,136 units. This finding reflects the economic
+structure of developed East Asian countries, where aging populations
+tend to be associated with higher levels of productivity and income.
 
-The overall model explains about 81.5% of the variation in GDP per capita (R squared =0.8153), with an adjusted R squared of 0.8114. This shows a substantial improvement in explanatory power compared to simple linear regression models.
+Finally, hours worked per capita were also significantly positively
+correlated with GDP per capita (β=7.463, p\<0.001), suggesting that
+higher average hours worked contributed to an increase in GDP per
+capita, which may reflect labor productivity and economic effort.
+
+The overall model explains about 81.5% of the variation in GDP per
+capita (R squared =0.8153), with an adjusted R squared of 0.8114. This
+shows a substantial improvement in explanatory power compared to simple
+linear regression models.
 
 \newpage
-# Discussion{#sec-disc}
-## Full model or reduced model?
-In the multiple regression analysis, the summary table shows that the unemployment rate is not as influential as other predictors, an ANOVA test is required to compare the explanatory power between full model and reduced model.
+
+# Discussion {#sec-disc}
+
+## Choice of full model or reduced model
+
+In the multiple regression analysis, the summary table shows that the
+unemployment rate is not as influential as other predictors, an ANOVA
+test is required to compare the explanatory power between full model and
+reduced model.
 
 ```{r}
 #| echo: false
@@ -325,28 +517,154 @@ reduced_model <- lm(gdp_over_pop ~ labor_force + pop_over_65 + hours_worked_over
                      data = east_asia_data)
 anova(full_model, reduced_model)
 ```
-The ANOVA test results show that when we compare the full model (which includes the predictor unemployment_r) to the reduced model (which does not include unemployment_r), the p-value is 0.05538. This indicates that the difference in model fit is not statistically significant at the usual 0.05 threshold. In other words, removing the unemployment_r predictor from the full model does not lead to a substantial loss in explanatory power, which implies we should keep the predictor for the overall data integrality.
+
+The ANOVA test results show that when we compare the full model (which
+includes the predictor `unemployment_r`) to the reduced model (which does
+not include `unemployment_r`), the p-value is 0.05538. This indicates that
+the difference in model fit is not statistically significant at the
+usual 0.05 threshold. In other words, removing the unemployment_r
+predictor from the full model does not lead to a substantial loss in
+explanatory power, which implies we should keep the predictor for the
+overall data integrality.
 
 ## Diminishing Impact of the Demographic Dividend
-As [@mason1997population] says in his book "Demography and the Asian Economic Miracle", an increase in the working-age population ratio would lead to an increase in income levels. That rapid increase in the working-age population due to a low birth rate would produce a "demographic dividend." However, demographic dividend occur less as less as time goes on. 
 
-In recent years,  major East Asian countries discussed in this paper have faced economic slowdowns. Countries like Japan, South Korea, and China, which once benefited from a growing working-age population, are now encountering challenges related to aging populations and declining birth rates.
+As Mason says in his book "Demography and the Asian
+Economic Miracle", an increase in the working-age population ratio would
+lead to an increase in income levels (@mason1997population). That rapid increase in the
+working-age population due to a low birth rate would produce a
+"demographic dividend." However, demographic dividend occur less as less
+as time goes on.
 
-Japan, has suffered severe economic stagnation in recent decades (@hoshi2004japan). Although Japan was one of the first countries to experience a "demographic dividend" during the post-World War II economic boom, its working-age population is shrinking due to low fertility rates and an aging society.According to Takeo Hoshi, Japan's GDP growth has slowed, and the country faces increasing social welfare costs for its elderly population. Against this backdrop, the "demographic dividend" that fueled Japan's economic rise appears to have largely dissipated, replaced by challenges such as labor shortages and falling consumer demand.
+In recent years, major East Asian countries discussed in this paper have
+faced economic slowdowns. Countries like Japan, South Korea, and China,
+which once benefited from a growing working-age population, are now
+encountering challenges related to aging populations and declining birth
+rates.
 
-In China, the one-child policy (which lasted from 1979 to 2015) reduced the birth rate, resulting in a growing elderly population. While China benefited from a demographic dividend during its rapid industrialization and economic growth shown in [@sec-GDPc], the country is likely to face a "demographic crisis" in the future since its working-age population begins to shrink. Despite the effect of COVID-19, part of China's slowdown can be attributed to a shrinking workforce and the growing fiscal burden in order to feed the aging population.
+Japan, has suffered severe economic stagnation in recent decades
+(@hoshi2004japan). Although Japan was one of the first countries to
+experience a "demographic dividend" during the post-World War II
+economic boom, its working-age population is shrinking due to low
+fertility rates and an aging society. According to Takeo Hoshi, Japan's
+GDP growth has slowed, and the country faces increasing social welfare
+costs for its elderly population. Against this backdrop, the
+"demographic dividend" that fueled Japan's economic rise appears to have
+largely dissipated, replaced by challenges such as labor shortages and
+falling consumer demand.
 
-In conclusion, while the demographic dividend once provided a huge boost to East Asia's economies, the region's major economies are now facing the negative effects of aging populations and declining birth rates. Over time, the demographic shift from a young, expanding workforce to an aging, shrinking population is becoming more evident in the economic performance of these countries, signaling that the era of demographic dividends may be coming to an end, leaving an significant macroeconomic problem to the government.
+In China, the one-child policy (which lasted from 1979 to 2015) reduced
+the birth rate, resulting in a growing elderly population. While China
+benefited from a demographic dividend during its rapid industrialization
+and economic growth shown in [@sec-GDPc], the country is likely to face
+a "demographic crisis" in the future since its working-age population
+begins to shrink. Despite the effect of COVID-19, part of China's
+slowdown can be attributed to a shrinking workforce and the growing
+fiscal burden in order to feed the aging population.
 
-## "Impact of Model Complexity on R-Squared
-In this paper, we observe that both simple linear regression and linear regression with interaction terms have R-squared values below 0.5, suggesting that these models can only explain less than half of the variance in the outcome variables, which is, GDP per capita. This suggests that either the model specification is missing important predictors, or the relationship between the variables is more complex than what is already captured. A multiple linear regression model, however, with four variables in this paper, showed a relatively higher R-squared value of more than 0.8, indicating a much better fit to the data because including additional variables  help explain a large portion of the variance. While a higher R-square generally indicates a stronger model, it also emphasizes the importance of selecting relevant variables; Too many predictors can lead to overfitting, with models capturing noise rather than the true underlying pattern.
+In conclusion, while the demographic dividend once provided a huge boost
+to East Asia's economies, the region's major economies are now facing
+the negative effects of aging populations and declining birth rates.
+Over time, the demographic shift from a young, expanding workforce to an
+aging, shrinking population is becoming more evident in the economic
+performance of these countries, signaling that the era of demographic
+dividends may be coming to an end, leaving an significant macroeconomic
+problem to the government.
+
+## Impact of Model Complexity on R-Squared
+
+In this paper, we observe that both simple linear regression and linear
+regression with interaction terms have R-squared values below 0.5,
+suggesting that these models can only explain less than half of the
+variance in the outcome variables, which is, GDP per capita. This
+suggests that either the model specification is missing important
+predictors, or the relationship between the variables is more complex
+than what is already captured. A multiple linear regression model,
+however, with four variables in this paper, showed a relatively higher
+R-squared value of more than 0.8, indicating a much better fit to the
+data because including additional variables help explain a large portion
+of the variance. While a higher R-square generally indicates a stronger
+model, it also emphasizes the importance of selecting relevant
+variables; Too many predictors can lead to overfitting, with models
+capturing noise rather than the true underlying pattern.
+
+## Weaknesses
+
+Although regression models provide general explanations, they still rely on
+certain assumptions that may not fully reflect the complexity of
+real-world economic systems. For example, linear regression assumes a
+constant relationship between the predictor and the outcome, but this
+relationship may not hold in the case of nonlinear interactions or
+changes in structure over time. While some terms for interactions are
+included to address this problem, the model may not capture other
+nonlinear effects.
+
+This paper focuses on a set of demographic and labor market predictors,
+but other factors—such as technological advancement, international
+trade, government policies, and institutional factors—were not included
+in the models. These variables may also significantly affect GDP per
+capita and could provide a more complete understanding of the economic
+dynamics in East Asia.
+
+The focus on East Asia restricts the analysis to a single region. While
+this allows for in-depth exploration of economic trends in this area, it
+also means that the findings cannot be generalized to other parts of the
+world. A broader analysis that includes countries from different regions
+would provide more context and might highlight whether the patterns
+observed in East Asia are unique to this region or shared globally.
+
+## Next Steps
+
+Future research could test nonlinear models to better capture the
+complexity of the relationship between predictors and GDP per capita.
+Methods such as polynomial regression, decision trees, or machine
+learning algorithms such as random forests can help model more complex
+patterns that current linear models cannot capture. In addition,
+extending the model to include other economic and social factors, such
+as technological innovation and education levels, would provide a more
+realistic view of the drivers of GDP growth. Finally, including
+countries in regions outside East Asia, such as Southeast Asia, Europe,
+or North America, can help determine whether the patterns found in this
+study are specific to East Asia or part of a broader global trend.
 
 \newpage
 
-# Appendix
-## Diagnostics
-### Simple Linear Regression{#sec-DSLR}
-To assess the simple regression model, we examine residuals for linearity, homoscedasticity, and normality,and uncorrelated errors.
+\appendix
+
+# Appendix - Raw Data {#sec-rawpreview}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: rawpreview
+#| fig-pos: "H"
+#| fig-cap: "Preview of the raw data"
+
+raw_data<- read.csv(here("data/01-raw_data/raw_data.csv"))
+# Extract the first 5 rows and all 15 columns
+data_first_5_rows <- raw_data[7762:7766, 1:15]
+# Split the data into 3 parts (5 variables per part)
+part1 <- data_first_5_rows[, 1:5]
+part2 <- data_first_5_rows[, 6:10]
+part3 <- data_first_5_rows[, 11:15]
+
+# Display the table
+print(part1)
+print(part2)
+print(part3)
+
+
+```
+This shows 5 rows in raw data, give an overall preview to the raw data.
+
+# Appendix - Data Validation
+
+## Simple Linear Regression Validation {#sec-DSLR}
+
+To assess the simple regression model, we examine residuals for
+linearity, homoscedasticity, and normality,and uncorrelated errors.
+
 ```{r}
 #| echo: false
 #| message: false
@@ -358,10 +676,17 @@ par(mfrow = c(2, 2))
 plot(simple_model)
 ```
 
-The residual diagnosis shows that while the model is statistically significant, the variability of the residual points to heteroscedasticity, while the unexplained variance suggests missing variables. It can be observed that there are slightly discrete patterns in the tail of the QQ graph, which does not affect to overall accuarcy.
+The residual diagnosis shows that while the model is statistically
+significant, the variability of the residual points to
+heteroscedasticity, while the unexplained variance suggests missing
+variables. It can be observed that there are slightly discrete patterns
+in the tail of the QQ graph, which does not affect to overall accuarcy.
 
-### Multiple Linear Regression{#sec-DMLR}
-To evaluate the assumptions of the MLR model, we examine residuals for linearity, homoscedasticity, and normality,and uncorrelated errors.
+## Multiple Linear Regression {#sec-DMLR}
+
+To evaluate the assumptions of the MLR model, we examine residuals for
+linearity, homoscedasticity, and normality,and uncorrelated errors.
+
 ```{r}
 #| echo: false
 #| message: false
@@ -373,7 +698,11 @@ par(mfrow = c(2, 2))
 plot(multiple_model)
 
 ```
-Multicollinearity occurs when predictors are highly correlated with each other, potentially inflating standard errors. We use the Variance Inflation Factor (VIF) to assess multicollinearity:
+
+Multicollinearity occurs when predictors are highly correlated with each
+other, potentially inflating standard errors. We use the Variance
+Inflation Factor (VIF) to assess multicollinearity:
+
 ```{r}
 #| echo: false
 #| message: false
@@ -383,7 +712,10 @@ Multicollinearity occurs when predictors are highly correlated with each other, 
 # Check for multicollinearity using VIF
 vif(multiple_model)
 ```
-The residuals should be independent. We test this assumption using the Durbin-Watson test:
+
+The residuals should be independent. We test this assumption using the
+Durbin-Watson test:
+
 ```{r}
 #| echo: false
 #| message: false
@@ -394,8 +726,11 @@ The residuals should be independent. We test this assumption using the Durbin-Wa
 dwtest(multiple_model)
 ```
 
-### Multiple Linear Regression (Interaction term included) {#sec-DINT}
-To evaluate the assumptions of the model, we examine residuals for linearity, homoscedasticity, and normality,and uncorrelated errors.
+## Multiple Linear Regression (Interaction term included) {#sec-DINT}
+
+To evaluate the assumptions of the model, we examine residuals for
+linearity, homoscedasticity, and normality,and uncorrelated errors.
+
 ```{r}
 #| echo: false
 #| message: false
@@ -407,7 +742,10 @@ par(mfrow = c(2, 2))
 plot(interaction_model)
 ```
 
-Interaction terms can introduce multicollinearity. As a result, we check Variance Inflation Factors (VIFs) to ensure predictors remain interpretable:
+Interaction terms can introduce multicollinearity. As a result, we check
+Variance Inflation Factors (VIFs) to ensure predictors remain
+interpretable:
+
 ```{r}
 #| echo: false
 #| message: false
@@ -417,7 +755,9 @@ Interaction terms can introduce multicollinearity. As a result, we check Varianc
 # Check for multicollinearity using VIF
 vif(interaction_model)
 ```
+
 We test for autocorrelation in residuals using the Durbin-Watson test:
+
 ```{r}
 #| echo: false
 #| message: false
@@ -428,7 +768,39 @@ We test for autocorrelation in residuals using the Durbin-Watson test:
 dwtest(interaction_model)
 ```
 
+# Appendix - Simulated Data Creation and Its Relationship to Surveys, Sampling, and Observational Data
+
+In this paper, we employ simulated data to model a set of socioeconomic
+indicators for countries in East Asia, such as population size, labor
+force, GDP, unemployment rates, and age demographics. These variables
+mirror the kind of information that might be gathered in national
+surveys or from observational data sources. The advantage of using
+simulated data in this context is that it allows for controlled
+experimentation, where we can test different hypotheses and analytical
+techniques without being constrained by the limitations or biases
+inherent in real-world datasets.
+
+The simulated data used in this study was created using a random
+sampling approach, with each variable being generated according to
+predefined distributions or value ranges that approximate real-world
+scenarios. For example, in the simulation, the variable representing
+population size (`pop`) was generated using a uniform distribution,
+where values range from 500,000 to 1.5 billion, reflecting the large
+population sizes found in East Asia. Similarly, other variables such as
+labor force (`labor_force`), GDP (`gdp`), and unemployment rate
+(`unemployment_r`) were modeled using random distributions within
+realistic bounds.
+
+The simulation mimics how real-world data might be gathered in surveys
+or observational studies. For example, the country variable is sampled
+from a predefined list of countries in East Asia, reflecting the target
+population of the study. This approach is analogous to stratified or
+random sampling in surveys, where the sample is drawn from a specific
+population to ensure representativeness. Additionally, the inclusion of
+variables such as GDP per capita and hours worked is reflective of the
+kind of socioeconomic data often collected in national surveys or labor
+force surveys.
+
 \newpage
 
 # References
-

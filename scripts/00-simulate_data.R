@@ -9,6 +9,7 @@
 
 
 # Load necessary libraries
+library(here)
 library(tidyverse)
 
 # Set seed for reproducibility
@@ -40,13 +41,13 @@ simulated_data <- tibble(
 )
 
 # Save the simulated dataset to the specified path
-write_csv(simulated_data, "~/STA304_Final/data/00-simulated_data/simulated_data.csv")
+write_csv(simulated_data, here("data/00-simulated_data/simulated_data.csv"))
 
 
 
 # Debugging after the test simulated_data
 # Load the dataset
-debugging_data <- read_csv("~/STA304_Final/data/00-simulated_data/simulated_data.csv")
+debugging_data <- read_csv( here("data/00-simulated_data/simulated_data.csv"))
 
 # Recalculate gdp_over_pop based on gdp and pop
 debugging_data <- debugging_data %>%
@@ -71,5 +72,5 @@ max_difference_fixed <- max(debugging_data$difference_fixed, na.rm = TRUE)
 print(paste("Maximum difference after fixing:", max_difference_fixed))
 
 # Save the corrected dataset
-write_csv(debugging_data, "~/STA304_Final/data/00-simulated_data/simulated_data.csv")
+write_csv(debugging_data,  here("data/00-simulated_data/simulated_data.csv"))
 

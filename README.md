@@ -23,13 +23,14 @@ The repository is organized as follows:
     -   Includes all files required for the final paper, such as the Quarto document, reference bibliography, and the generated PDF.
 
 -   **`scripts/`**:
-    -   Holds R scripts for data cleaning, simulations, model generation, and visualization.
+    -   Holds R scripts for data cleaning, simulations, model generation, and visualization, etc.
 
 ## Statement on LLM Usage
 
 LLMs like ChatGPT were utilized during the project to:
 -   Generate R code for data analysis, model building, and visualization.
 -   Assist with structuring the Quarto document and drafting sections of the paper.
+-   Assist on citations.
 
 The assistance provided by LLMs was focused on improving efficiency and accuracy. A record of LLM interactions is available in `other/` for transparency.
 

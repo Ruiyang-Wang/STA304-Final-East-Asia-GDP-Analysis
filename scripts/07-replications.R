@@ -9,14 +9,15 @@
 
 
 # Setups
-install.packages("car")
-install.packages("lmtest")
 library(tidyverse)
 library(ggplot2)
 library(reshape2)
 library(car)
 library(lmtest)
-east_asia_data <- read_csv("~/STA304_Final/data/02-analysis_data/analysis_data.csv")
+library(here)
+library(modelsummary)
+
+east_asia_data <- read_csv(here("data/02-analysis_data/analysis_data.csv"))
 
 # Data Overview
 # GDP Per Capita Trends
@@ -80,7 +81,7 @@ ggplot(other_countries_data, aes(x = labor_force, y = gdp_over_pop, color = coun
 # LR models with SLR, MLR, and interaction terms
 # Simple Linear Regression
 simple_model <- lm(gdp_over_pop ~ year, data = east_asia_data)
-summary(simple_model)
+modelsummary::modelsummary(simple_model)
 
 # Residual Diagnostics for the Simple Linear Regression Model
 par(mfrow = c(2, 2))
@@ -89,7 +90,7 @@ plot(simple_model)
 # Multiple Linear Regression
 multiple_model <- lm(gdp_over_pop ~ unemployment_r + labor_force + pop_over_65 + hours_worked_over_pop_combined, 
                      data = east_asia_data)
-summary(multiple_model)
+modelsummary::modelsummary(multiple_model)
 
 # Residual Diagnostics for the Multiple Linear Regression Model
 par(mfrow = c(2, 2))
@@ -103,7 +104,7 @@ dwtest(multiple_model)
 
 # Multiple Linear Regression with Interaction Terms
 interaction_model <- lm(gdp_over_pop ~ pop_15_to_64 * labor_force, data = east_asia_data)
-summary(interaction_model)
+modelsummary::modelsummary(interaction_model)
 
 # Residual Diagnostics for the Interaction Model
 par(mfrow = c(2, 2))

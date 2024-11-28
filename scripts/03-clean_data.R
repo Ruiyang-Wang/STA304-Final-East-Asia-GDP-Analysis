@@ -10,8 +10,11 @@
 library(tidyverse)
 library(readr)
 library(dplyr)
+library(here)
+library(arrow)
 
-raw_data <- read_csv("~/STA304_Final/data/01-raw_data/raw_data.csv")
+
+raw_data <- read_csv(here("data/01-raw_data/raw_data.csv"))
 
 cleaned_data <- raw_data %>%
   filter(
@@ -31,4 +34,5 @@ cleaned_data <- raw_data %>%
   )
 
 #### Save data ####
-write_csv(cleaned_data, "~/STA304_Final/data/02-analysis_data/analysis_data.csv")
+write_csv(cleaned_data, here("data/02-analysis_data/analysis_data.csv"))
+write_parquet(cleaned_data, here("data/02-analysis_data/analysis_data.parquet"))

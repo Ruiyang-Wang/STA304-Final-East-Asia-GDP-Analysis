@@ -8,14 +8,13 @@
 # Any other information needed? None
 
 # Setups
-install.packages("car")
-install.packages("lmtest")
 library(tidyverse)
 library(ggplot2)
 library(reshape2)
 library(car)
 library(lmtest)
-east_asia_data <- read_csv("~/STA304_Final/data/02-analysis_data/analysis_data.csv")
+library(here)
+east_asia_data <- read_csv(here("data/02-analysis_data/analysis_data.csv"))
 
 # Data Overview
 # GDP Per Capita Trends

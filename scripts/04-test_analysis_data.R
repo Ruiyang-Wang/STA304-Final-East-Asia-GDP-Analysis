@@ -10,9 +10,10 @@
 
 library(testthat)
 library(tidyverse)
+library(here)
 
 # Load the analysis dataset
-analysis_data <- read_csv("~/STA304_Final/data/02-analysis_data/analysis_data.csv")
+analysis_data <- read_csv(here("data/02-analysis_data/analysis_data.csv"))
 
 # Test if all expected columns are present
 test_that("Dataset contains all expected columns", {
